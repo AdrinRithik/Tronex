@@ -1,0 +1,1070 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ThermalShelter — AI-Powered Shelter Design & Thermal Analysis</title>
+    <meta name="description"
+        content="Design climate-adaptive shelters with 3D visualization, ANSYS Fluent thermal simulation, and ML-powered comfort prediction.">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/style.css">
+
+    <!-- Leaflet.js (Map) -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+    <!-- Three.js & OrbitControls -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/TransformControls.js"></script>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+</head>
+
+<body>
+
+    <!-- ════════════════════════════════════════════════
+     LANDING HERO PAGE
+════════════════════════════════════════════════ -->
+    <div id="landing">
+        <div id="app">
+            <!-- Header -->
+            <header class="site-header">
+                <a class="site-logo" href="#">
+                    <div class="logo-icon">🏜️</div>
+                    <div class="logo-text">
+                        <span class="logo-title">ThermalShelter</span>
+                        <span class="logo-sub">AI Design Platform</span>
+                    </div>
+                </a>
+                <div class="header-right">
+                    <span class="header-badge">ANSYS Fluent · ML Powered</span>
+                </div>
+            </header>
+
+            <!-- Hero -->
+            <main class="main-content" style="max-width:1200px">
+                <section class="hero-section">
+                    <div class="hero-badge">🔬 Thermal Comfort Engineering Platform</div>
+
+                    <h1 class="hero-title">
+                        Design Smarter Shelters<br>
+                        with <span class="gradient-text">Thermal Intelligence</span>
+                    </h1>
+
+                    <p class="hero-sub">
+                        Input your location, choose a shelter model, select materials,
+                        and let our ANSYS Fluent simulation + ML model evaluate and optimize
+                        your shelter's thermal performance.
+                    </p>
+
+                    <div class="hero-features">
+                        <div class="hero-feature">📍 Climate-Aware Design</div>
+                        <div class="hero-feature">🏠 15 Image Shelter Models</div>
+                        <div class="hero-feature">🧱 3 Material Tiers</div>
+                        <div class="hero-feature">🎮 Interactive 3D View</div>
+                        <div class="hero-feature">⚙️ ANSYS Fluent Sim</div>
+                        <div class="hero-feature">🧠 ML Comfort Prediction</div>
+                        <div class="hero-feature">🔄 Auto Optimization</div>
+                    </div>
+
+                    <button class="btn-start" id="btn-start">
+                        <span class="btn-icon">🚀</span>
+                        <span>Start Designing Your Shelter</span>
+                    </button>
+
+                    <!-- Pipeline Flow -->
+                    <div class="pipeline-flow">
+                        <div class="flow-step">
+                            <div class="flow-icon">📍</div>
+                            <div class="flow-label">Location</div>
+                        </div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-step">
+                            <div class="flow-icon">📐</div>
+                            <div class="flow-label">Dimensions</div>
+                        </div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-step">
+                            <div class="flow-icon">🧱</div>
+                            <div class="flow-label">Materials</div>
+                        </div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-step">
+                            <div class="flow-icon">🏠</div>
+                            <div class="flow-label">3D View</div>
+                        </div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-step">
+                            <div class="flow-icon">⚙️</div>
+                            <div class="flow-label">ANSYS Sim</div>
+                        </div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-step">
+                            <div class="flow-icon">🧠</div>
+                            <div class="flow-label">ML Predict</div>
+                        </div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-step">
+                            <div class="flow-icon">✅</div>
+                            <div class="flow-label">Optimize</div>
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <!-- ════════════════════════════════════════════════
+     APP SHELL (Steps 1-7)
+════════════════════════════════════════════════ -->
+    <div id="app-shell" class="hidden">
+        <div id="app">
+
+            <!-- Header -->
+            <header class="site-header">
+                <a class="site-logo" href="#"
+                    onclick="document.getElementById('landing').classList.remove('hidden');document.getElementById('app-shell').classList.add('hidden');return false;">
+                    <div class="logo-icon">🏜️</div>
+                    <div class="logo-text">
+                        <span class="logo-title">ThermalShelter</span>
+                        <span class="logo-sub">AI Design Platform</span>
+                    </div>
+                </a>
+                <div class="header-right" style="display:flex;align-items:center;gap:10px">
+                    <button id="btn-open-gemini" style="background:linear-gradient(135deg,rgba(92,51,23,0.9),rgba(200,113,61,0.9));border:1px solid var(--gold);color:var(--sandal-light);padding:6px 14px;border-radius:20px;font-size:0.78rem;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px">
+                        ✨ Gemini AI Assistant
+                    </button>
+                    <span class="header-badge" id="climate-header-badge">Select Location</span>
+                </div>
+            </header>
+
+            <!-- Step Progress -->
+            <nav class="step-progress" role="navigation" aria-label="Design steps">
+                <div class="step-item active" data-step="1">
+                    <div class="step-dot active" title="Location">📍</div>
+                    <div class="step-label">Location</div>
+                </div>
+                <div class="step-connector" data-after="1">
+                    <div class="step-connector-fill"></div>
+                </div>
+                <div class="step-item" data-step="2">
+                    <div class="step-dot" title="Dimensions">📐</div>
+                    <div class="step-label">Dimensions</div>
+                </div>
+                <div class="step-connector" data-after="2">
+                    <div class="step-connector-fill"></div>
+                </div>
+                <div class="step-item" data-step="3">
+                    <div class="step-dot" title="Materials">🧱</div>
+                    <div class="step-label">Materials</div>
+                </div>
+                <div class="step-connector" data-after="3">
+                    <div class="step-connector-fill"></div>
+                </div>
+                <div class="step-item" data-step="4">
+                    <div class="step-dot" title="3D View">🎯</div>
+                    <div class="step-label">3D View</div>
+                </div>
+                <div class="step-connector" data-after="4">
+                    <div class="step-connector-fill"></div>
+                </div>
+                <div class="step-item" data-step="5">
+                    <div class="step-dot" title="Simulation">⚙️</div>
+                    <div class="step-label">Simulation</div>
+                </div>
+                <div class="step-connector" data-after="5">
+                    <div class="step-connector-fill"></div>
+                </div>
+                <div class="step-item" data-step="6">
+                    <div class="step-dot" title="Results">📊</div>
+                    <div class="step-label">Results</div>
+                </div>
+                <div class="step-connector" data-after="6">
+                    <div class="step-connector-fill"></div>
+                </div>
+                <div class="step-item" data-step="7">
+                    <div class="step-dot" title="Optimize">🔄</div>
+                    <div class="step-label">Optimize</div>
+                </div>
+            </nav>
+
+            <!-- Main Content -->
+            <main class="main-content">
+
+                <!-- ────────────────────────────────────────
+           STEP 1 — LOCATION
+      ──────────────────────────────────────── -->
+                <section id="step-1" class="step-panel active">
+                    <div class="section-header">
+                        <div class="section-tag">Step 1 of 7</div>
+                        <h1 class="section-title">Choose Your <span>Location</span></h1>
+                        <p class="section-sub">Search for your site location. We'll automatically detect the climate
+                            zone and design parameters.</p>
+                    </div>
+
+                    <div class="location-layout">
+                        <!-- Left: Search + Climate Info -->
+                        <div class="glass-card">
+                            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+                                <div style="font-size:0.82rem;font-weight:700;color:var(--sandal-light);letter-spacing:0.5px">
+                                    🔍 Location & Climate Zone
+                                </div>
+                                <div class="preset-locs" style="display:flex;gap:6px;flex-wrap:wrap">
+                                    <button type="button" class="btn-preset-loc" id="preset-leh" style="padding:4px 10px;border-radius:14px;border:1px solid var(--gold);background:rgba(200,113,61,0.3);color:var(--sandal-light);font-size:0.72rem;cursor:pointer;font-weight:600">
+                                        🏔️ Leh, Ladakh (Cold Desert)
+                                    </button>
+                                    <button type="button" class="btn-preset-loc" id="preset-jodhpur" style="padding:4px 10px;border-radius:14px;border:1px solid var(--glass-border);background:rgba(26,13,6,0.4);color:var(--tan);font-size:0.72rem;cursor:pointer">
+                                        ☀️ Jodhpur (Arid)
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="climate-select-wrap" style="margin-bottom:14px;display:flex;flex-direction:column;gap:8px">
+                                <label for="climate-region-select" style="font-size:0.72rem;font-weight:700;color:var(--gold);letter-spacing:0.08em;text-transform:uppercase">Region / Climate</label>
+                                <select id="climate-region-select" style="background:rgba(0,0,0,0.28);border:1px solid var(--glass-border);border-radius:10px;color:var(--sandal-light);padding:10px 12px;font-size:0.82rem;outline:none">
+                                    <option value="tropical">Tropical</option>
+                                    <option value="hot-humid-coastal">Hot & Humid / Coastal</option>
+                                    <option value="hot-dry-desert">Hot & Dry / Desert</option>
+                                    <option value="arid">Arid / Desert</option>
+                                    <option value="temperate">Temperate</option>
+                                    <option value="moderate">Moderate Climate</option>
+                                    <option value="heavy-rain">Heavy Rain</option>
+                                    <option value="high-wind">High Wind</option>
+                                    <option value="cold">Cold / Sub-Arctic</option>
+                                    <option value="high-altitude-cold">High Altitude / Very Cold</option>
+                                    <option value="polar">Polar / Arctic</option>
+                                </select>
+                            </div>
+
+                            <div class="search-wrapper">
+                                <span class="search-icon">🌍</span>
+                                <input type="text" class="search-input" id="location-search"
+                                    placeholder="Type a city, region, or address...">
+                                <div class="autocomplete-list" id="autocomplete-list"></div>
+                            </div>
+
+                            <!-- ── Coordinate Input Row ── -->
+                            <div class="coord-row">
+                                <div class="coord-field">
+                                    <label class="coord-label" for="input-lat">🧭 Latitude</label>
+                                    <input type="number" class="coord-input" id="input-lat"
+                                        placeholder="-90 to 90" min="-90" max="90" step="0.000001">
+                                </div>
+                                <div class="coord-field">
+                                    <label class="coord-label" for="input-lon">🧭 Longitude</label>
+                                    <input type="number" class="coord-input" id="input-lon"
+                                        placeholder="-180 to 180" min="-180" max="180" step="0.000001">
+                                </div>
+                                <button class="coord-go-btn" id="coord-go-btn" title="Go to coordinates">
+                                    <span>Go</span>
+                                    <span class="coord-go-icon">→</span>
+                                </button>
+                            </div>
+
+                            <div id="map-container"></div>
+                            <p style="font-size:0.75rem;color:var(--tan);margin-top:8px">
+                                💡 Click the map, search a place, or enter exact coordinates above
+                            </p>
+                            <div id="climate-info-container"></div>
+                        </div>
+
+                        <!-- Right: Info Panel -->
+                        <div>
+                            <div class="glass-card" style="margin-bottom:20px">
+                                <div
+                                    style="font-size:0.82rem;font-weight:700;color:var(--sandal-light);margin-bottom:16px">
+                                    🌐 Climate Zones Explained</div>
+                                <div style="display:flex;flex-direction:column;gap:10px">
+                                    <div
+                                        style="display:flex;align-items:center;gap:10px;padding:10px;background:rgba(26,13,6,0.4);border-radius:8px">
+                                        <span style="font-size:22px">🌴</span>
+                                        <div>
+                                            <div style="font-size:0.82rem;color:var(--sandal-light);font-weight:700">
+                                                Tropical</div>
+                                            <div style="font-size:0.72rem;color:var(--tan)">Hot & humid, ventilation
+                                                critical</div>
+                                        </div>
+                                    </div>
+                                    <div
+                                        style="display:flex;align-items:center;gap:10px;padding:10px;background:rgba(26,13,6,0.4);border-radius:8px">
+                                        <span style="font-size:22px">☀️</span>
+                                        <div>
+                                            <div style="font-size:0.82rem;color:var(--sandal-light);font-weight:700">
+                                                Arid / Desert</div>
+                                            <div style="font-size:0.72rem;color:var(--tan)">Extreme heat, high thermal
+                                                mass needed</div>
+                                        </div>
+                                    </div>
+                                    <div
+                                        style="display:flex;align-items:center;gap:10px;padding:10px;background:rgba(26,13,6,0.4);border-radius:8px">
+                                        <span style="font-size:22px">🌿</span>
+                                        <div>
+                                            <div style="font-size:0.82rem;color:var(--sandal-light);font-weight:700">
+                                                Temperate</div>
+                                            <div style="font-size:0.72rem;color:var(--tan)">Balanced insulation for all
+                                                seasons</div>
+                                        </div>
+                                    </div>
+                                    <div
+                                        style="display:flex;align-items:center;gap:10px;padding:10px;background:rgba(26,13,6,0.4);border-radius:8px">
+                                        <span style="font-size:22px">❄️</span>
+                                        <div>
+                                            <div style="font-size:0.82rem;color:var(--sandal-light);font-weight:700">
+                                                Cold / Sub-Arctic</div>
+                                            <div style="font-size:0.72rem;color:var(--tan)">Maximum insulation,
+                                                airtightness</div>
+                                        </div>
+                                    </div>
+                                    <div
+                                        style="display:flex;align-items:center;gap:10px;padding:10px;background:rgba(26,13,6,0.4);border-radius:8px">
+                                        <span style="font-size:22px">🌨️</span>
+                                        <div>
+                                            <div style="font-size:0.82rem;color:var(--sandal-light);font-weight:700">
+                                                Polar / Arctic</div>
+                                            <div style="font-size:0.72rem;color:var(--tan)">Ultra-premium insulation
+                                                mandatory</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="nav-buttons">
+                        <div></div>
+                        <button class="btn-next" data-next="2">Next: Set Dimensions <span>→</span></button>
+                    </div>
+                </section>
+
+                <!-- ────────────────────────────────────────
+           STEP 2 — SHELTER DIMENSIONS
+      ──────────────────────────────────────── -->
+                <section id="step-2" class="step-panel">
+                    <div class="section-header">
+                        <div class="section-tag">Step 2 of 7</div>
+                        <h1 class="section-title">Shelter <span>Dimensions</span></h1>
+                        <p class="section-sub">Customize the physical dimensions of your shelter (width, length, wall height, and roof pitch).</p>
+                    </div>
+
+                    <div class="loc-model-info-banner" id="dims-model-info-banner" style="display:flex;align-items:center;gap:14px;padding:14px 18px;background:linear-gradient(135deg,rgba(92,51,23,0.35),rgba(200,113,61,0.12));border:1px solid rgba(212,169,106,0.3);border-radius:var(--radius-md);margin-bottom:20px">
+                        <div style="font-size:26px;flex-shrink:0">🏠</div>
+                        <div>
+                            <div style="font-size:0.84rem;font-weight:700;color:var(--gold)" id="dims-model-banner-title">Climate-Optimized Architecture Enabled</div>
+                            <div style="font-size:0.76rem;color:var(--sandal-light);margin-top:2px" id="dims-model-banner-desc">Form factor will be visualized and selectable in the <b>Virtual 3D View (Step 4)</b>, tailored for your selected site.</div>
+                        </div>
+                    </div>
+
+                    <div class="glass-card">
+                        <div
+                            style="font-size:0.82rem;font-weight:700;color:var(--sandal-light);margin-bottom:18px;letter-spacing:0.5px">
+                            📐 Set Dimensions
+                        </div>
+                        <div class="dims-grid" id="dims-sliders"></div>
+
+                        <div class="area-display">
+                            <div style="text-align:center">
+                                <div class="area-value" id="dims-area">80.0</div>
+                                <div class="area-unit">Floor Area (m²)</div>
+                            </div>
+                            <div style="width:1px;height:40px;background:var(--glass-border)"></div>
+                            <div style="text-align:center">
+                                <div class="area-value" id="dims-vol">210.0</div>
+                                <div class="area-unit">Volume (m³)</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="nav-buttons">
+                        <button class="btn-back" data-back="1">← Back</button>
+                        <button class="btn-next" data-next="3">Next: Select Materials →</button>
+                    </div>
+                </section>
+
+                <!-- ────────────────────────────────────────
+           STEP 3 — MATERIALS
+      ──────────────────────────────────────── -->
+                <section id="step-3" class="step-panel">
+                    <div class="section-header">
+                        <div class="section-tag">Step 3 of 7</div>
+                        <h1 class="section-title">Select <span>Building Materials</span></h1>
+                        <p class="section-sub">Choose materials for walls, roof, and floor. Three price tiers available
+                            with full thermal specifications.</p>
+                    </div>
+
+                    <div class="glass-card">
+                        <div id="material-recommendation-panel"></div>
+
+                        <!-- Component Tabs -->
+                        <div class="material-tabs" id="mat-component-tabs">
+                            <!-- Rendered by materials.js -->
+                        </div>
+
+                        <!-- Section Container -->
+                        <div id="mat-section-container"></div>
+
+                        <!-- Selection Summary -->
+                        <div class="selected-summary">
+                            <div class="sel-item">
+                                <div class="sel-label">🧱 Wall Material</div>
+                                <div class="sel-value" id="sum-wall">Not selected</div>
+                            </div>
+                            <div class="sel-item">
+                                <div class="sel-label">🏠 Roof Material</div>
+                                <div class="sel-value" id="sum-roof">Not selected</div>
+                            </div>
+                            <div class="sel-item">
+                                <div class="sel-label">🚪 Door Material</div>
+                                <div class="sel-value" id="sum-door">Not selected</div>
+                            </div>
+                            <div class="sel-item">
+                                <div class="sel-label">⬛ Floor Material</div>
+                                <div class="sel-value" id="sum-floor">Not selected</div>
+                            </div>
+                            <div class="sel-item">
+                                <div class="sel-label">🪟 Window Material</div>
+                                <div class="sel-value" id="sum-window">Not selected</div>
+                            </div>
+                            <div class="sel-item">
+                                <div class="sel-label">₹ Estimated Cost</div>
+                                <div class="sel-value" id="sum-cost">₹0</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="nav-buttons">
+                        <button class="btn-back" data-back="2">← Back</button>
+                        <button class="btn-next" data-next="4">Next: Virtual 3D View →</button>
+                    </div>
+                </section>
+
+                <!-- ────────────────────────────────────────
+           STEP 4 — 3D VIEWER
+      ──────────────────────────────────────── -->
+                <section id="step-4" class="step-panel">
+                    <div class="section-header">
+                        <div class="section-tag">Step 4 of 7</div>
+                        <h1 class="section-title">Virtual <span>3D View</span></h1>
+                        <p class="section-sub">Inspect the reference-sheet shelter models in interactive 3D with front, back, side, and top views.</p>
+                    </div>
+
+                    <!-- Shelter Model Types Selector in 3D View -->
+                    <div class="viewer-models-container glass-card" style="margin-bottom:20px">
+                        <div class="viewer-models-header">
+                            <div class="viewer-models-title-wrap">
+                                <span class="viewer-models-heading">3D Shelter Models</span>
+                                <span class="viewer-models-sub">Select a shelter form from the reference drawing to inspect it in 3D</span>
+                            </div>
+                            <div class="location-suitability-pill" id="viewer-suitability-pill">
+                                📍 Recommended: <span id="viewer-suitability-model-name">—</span>
+                            </div>
+                        </div>
+                        <div class="viewer-models-grid" id="viewer-models-strip">
+                            <!-- Rendered dynamically by dimensions.js / viewer3d.js -->
+                        </div>
+                    </div>
+
+                    <div class="viewer-layout">
+                        <!-- 3D Viewer -->
+                        <div class="viewer-container" id="threejs-container">
+                            <div class="viewer-overlay-controls">
+                                <button class="viewer-btn" id="btn-auto-rotate" title="Toggle Auto-Rotate">🔄</button>
+                                <button class="viewer-btn" id="btn-reset-cam" title="Reset Camera">🎯</button>
+                            </div>
+                            <div class="viewer-label">🖱️ Drag to Orbit · Scroll to Zoom · Right-click to Pan</div>
+                        </div>
+
+                        <!-- Sidebar -->
+                        <div class="viewer-sidebar">
+                            <div class="info-card">
+                                <div class="info-card-title">Shelter Specification</div>
+                                <div class="info-row"><span class="key">Type</span><span class="value"
+                                        id="info-model">—</span></div>
+                                <div class="info-row"><span class="key">Location Match</span><span class="value"
+                                        id="info-model-suitability" style="color:#4CAF50;font-size:0.75rem;font-weight:700">—</span></div>
+                                <div class="info-row"><span class="key">Climate</span><span class="value"
+                                        id="info-climate">—</span></div>
+                                <div class="info-row"><span class="key">Width</span><span class="value"
+                                        id="info-width">—</span></div>
+                                <div class="info-row"><span class="key">Length</span><span class="value"
+                                        id="info-length">—</span></div>
+                                <div class="info-row"><span class="key">Height</span><span class="value"
+                                        id="info-height">—</span></div>
+                                <div class="info-row"><span class="key">Floor Area</span><span class="value"
+                                        id="info-area">—</span></div>
+                            </div>
+
+                            <div class="info-card">
+                                <div class="info-card-title">Materials Selected</div>
+                                <div class="info-row"><span class="key">🧱 Wall</span><span class="value"
+                                        id="info-wall">—</span></div>
+                                <div class="info-row"><span class="key">🏠 Roof</span><span class="value"
+                                        id="info-roof">—</span></div>
+                                <div class="info-row"><span class="key">🚪 Door</span><span class="value"
+                                        id="info-door">—</span></div>
+                                <div class="info-row"><span class="key">⬛ Floor</span><span class="value"
+                                        id="info-floor">—</span></div>
+                                <div class="info-row"><span class="key">🪟 Window</span><span class="value"
+                                        id="info-window">—</span></div>
+                            </div>
+
+                            <div class="info-card"
+                                style="background:linear-gradient(135deg,rgba(92,51,23,0.4),rgba(200,113,61,0.15));border-color:rgba(200,113,61,0.4)">
+                                <div
+                                    style="font-size:0.78rem;font-weight:700;color:var(--sandal-light);margin-bottom:8px">
+                                    Ready for Analysis</div>
+                                <div style="font-size:0.75rem;color:var(--tan);margin-bottom:16px">
+                                    Your shelter is configured. Click below to run the ANSYS Fluent thermal simulation.
+                                </div>
+                                <button class="btn-run-analysis" id="btn-run-analysis">
+                                    <span>⚡ RUN THERMAL ANALYSIS</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="nav-buttons">
+                        <button class="btn-back" data-back="3">← Back</button>
+                        <div></div>
+                    </div>
+                </section>
+
+                <!-- ────────────────────────────────────────
+           STEP 5 — SIMULATION
+      ──────────────────────────────────────── -->
+                <section id="step-5" class="step-panel">
+                    <div class="section-header">
+                        <div class="section-tag">Step 5 of 7</div>
+                        <h1 class="section-title">ANSYS Fluent <span>Thermal Simulation</span></h1>
+                        <p class="section-sub">Running CFD analysis and ML thermal comfort prediction on your shelter
+                            design.</p>
+                    </div>
+
+                    <div class="sim-layout">
+                        <!-- Stages -->
+                        <div>
+                            <div
+                                style="font-size:0.82rem;font-weight:700;color:var(--sandal-light);margin-bottom:16px;letter-spacing:0.5px">
+                                📋 Simulation Pipeline
+                            </div>
+                            <div class="stages-list">
+                                <div class="sim-stage" id="stage-mesh">
+                                    <div class="stage-icon-wrap">🔲</div>
+                                    <div class="stage-info">
+                                        <div class="stage-name">Stage 1 — Geometry Meshing</div>
+                                        <div class="stage-progress-bar">
+                                            <div class="stage-progress-fill" id="stage-fill-mesh"></div>
+                                        </div>
+                                        <div class="stage-status" id="stage-status-mesh">Waiting...</div>
+                                    </div>
+                                </div>
+                                <div class="sim-stage" id="stage-boundary">
+                                    <div class="stage-icon-wrap">🌡️</div>
+                                    <div class="stage-info">
+                                        <div class="stage-name">Stage 2 — Boundary Conditions</div>
+                                        <div class="stage-progress-bar">
+                                            <div class="stage-progress-fill" id="stage-fill-boundary"></div>
+                                        </div>
+                                        <div class="stage-status" id="stage-status-boundary">Waiting...</div>
+                                    </div>
+                                </div>
+                                <div class="sim-stage" id="stage-solver">
+                                    <div class="stage-icon-wrap">⚙️</div>
+                                    <div class="stage-info">
+                                        <div class="stage-name">Stage 3 — CFD Solver (287 Iterations)</div>
+                                        <div class="stage-progress-bar">
+                                            <div class="stage-progress-fill" id="stage-fill-solver"></div>
+                                        </div>
+                                        <div class="stage-status" id="stage-status-solver">Waiting...</div>
+                                    </div>
+                                </div>
+                                <div class="sim-stage" id="stage-postprocess">
+                                    <div class="stage-icon-wrap">🧠</div>
+                                    <div class="stage-info">
+                                        <div class="stage-name">Stage 4 — Post-Processing & ML</div>
+                                        <div class="stage-progress-bar">
+                                            <div class="stage-progress-fill" id="stage-fill-postprocess"></div>
+                                        </div>
+                                        <div class="stage-status" id="stage-status-postprocess">Waiting...</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Convergence Chart -->
+                            <div class="glass-card-dark" style="margin-top:20px">
+                                <div
+                                    style="font-size:0.75rem;color:var(--tan);margin-bottom:10px;font-weight:700;letter-spacing:1px">
+                                    CONVERGENCE HISTORY</div>
+                                <div class="chart-container">
+                                    <canvas id="convergence-chart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Terminal -->
+                        <div>
+                            <div
+                                style="font-size:0.82rem;font-weight:700;color:var(--sandal-light);margin-bottom:16px;letter-spacing:0.5px">
+                                💻 Simulation Log
+                            </div>
+                            <div class="sim-terminal">
+                                <div class="terminal-header">
+                                    <div class="terminal-dot red"></div>
+                                    <div class="terminal-dot yellow"></div>
+                                    <div class="terminal-dot green"></div>
+                                    <span class="terminal-title">ANSYS Fluent 2024 R2 — Solver Output</span>
+                                </div>
+                                <pre id="sim-terminal-body" style="white-space:pre-wrap"></pre>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="nav-buttons">
+                        <button class="btn-back" data-back="4">← Back to 3D View</button>
+                        <button class="btn-next" data-next="6">View Results →</button>
+                    </div>
+                </section>
+
+                <!-- ────────────────────────────────────────
+           STEP 6 — RESULTS & ML
+      ──────────────────────────────────────── -->
+                <section id="step-6" class="step-panel">
+                    <div class="section-header">
+                        <div class="section-tag">Step 6 of 7</div>
+                        <h1 class="section-title">Thermal <span>Analysis Results</span></h1>
+                        <p class="section-sub">ML-powered comfort prediction based on your climate, materials, and
+                            shelter geometry.</p>
+                    </div>
+
+                    <!-- Verdict -->
+                    <div style="text-align:center;margin-bottom:36px">
+                        <div class="verdict-badge comfortable" id="verdict-badge">
+                            <span>⏳</span> ANALYZING...
+                        </div>
+                        <div style="font-size:0.8rem;color:var(--tan);margin-top:8px;font-family:var(--font-mono)"
+                            id="confidence-text">
+                            Running ML model...
+                        </div>
+                    </div>
+
+                    <!-- Metrics Gauges -->
+                    <div class="metrics-grid">
+                        <!-- Temperature -->
+                        <div class="metric-card">
+                            <div class="metric-gauge" id="gauge-temp">
+                                <svg width="120" height="120" viewBox="0 0 120 120">
+                                    <circle class="gauge-bg" cx="60" cy="60" r="50" />
+                                    <circle class="gauge-fill" cx="60" cy="60" r="50" stroke="#4CAF7D"
+                                        stroke-dasharray="314" stroke-dashoffset="314" />
+                                </svg>
+                                <div class="gauge-val">
+                                    <div class="gauge-num">—</div>
+                                    <div class="gauge-unit">°C</div>
+                                </div>
+                            </div>
+                            <div class="metric-label">Indoor Temperature</div>
+                            <div class="metric-score">Temperature Comfort Score</div>
+                        </div>
+
+                        <!-- Humidity -->
+                        <div class="metric-card">
+                            <div class="metric-gauge" id="gauge-humidity">
+                                <svg width="120" height="120" viewBox="0 0 120 120">
+                                    <circle class="gauge-bg" cx="60" cy="60" r="50" />
+                                    <circle class="gauge-fill" cx="60" cy="60" r="50" stroke="#5B9BD5"
+                                        stroke-dasharray="314" stroke-dashoffset="314" />
+                                </svg>
+                                <div class="gauge-val">
+                                    <div class="gauge-num">—</div>
+                                    <div class="gauge-unit">%</div>
+                                </div>
+                            </div>
+                            <div class="metric-label">Indoor Humidity</div>
+                            <div class="metric-score">Humidity Comfort Score</div>
+                        </div>
+
+                        <!-- Airflow -->
+                        <div class="metric-card">
+                            <div class="metric-gauge" id="gauge-airflow">
+                                <svg width="120" height="120" viewBox="0 0 120 120">
+                                    <circle class="gauge-bg" cx="60" cy="60" r="50" />
+                                    <circle class="gauge-fill" cx="60" cy="60" r="50" stroke="#D4A96A"
+                                        stroke-dasharray="314" stroke-dashoffset="314" />
+                                </svg>
+                                <div class="gauge-val">
+                                    <div class="gauge-num">—</div>
+                                    <div class="gauge-unit">ACH</div>
+                                </div>
+                            </div>
+                            <div class="metric-label">Air Changes/Hour</div>
+                            <div class="metric-score">Airflow Score</div>
+                        </div>
+                    </div>
+
+                    <!-- Score Breakdown -->
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px">
+                        <div class="glass-card">
+                            <div
+                                style="font-size:0.78rem;font-weight:700;color:var(--tan);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:18px">
+                                Score Breakdown
+                            </div>
+                            <div class="score-breakdown">
+                                <div class="score-row">
+                                    <span class="score-label">🌡️ Temperature</span>
+                                    <div class="score-bar-track">
+                                        <div class="score-bar-fill" id="bar-temp" style="width:0%;background:#4CAF7D">
+                                        </div>
+                                    </div>
+                                    <span class="score-val" id="bar-temp-val">—</span>
+                                </div>
+                                <div class="score-row">
+                                    <span class="score-label">💧 Humidity</span>
+                                    <div class="score-bar-track">
+                                        <div class="score-bar-fill" id="bar-humidity"
+                                            style="width:0%;background:#5B9BD5"></div>
+                                    </div>
+                                    <span class="score-val" id="bar-humidity-val">—</span>
+                                </div>
+                                <div class="score-row">
+                                    <span class="score-label">💨 Airflow</span>
+                                    <div class="score-bar-track">
+                                        <div class="score-bar-fill" id="bar-airflow"
+                                            style="width:0%;background:#D4A96A"></div>
+                                    </div>
+                                    <span class="score-val" id="bar-airflow-val">—</span>
+                                </div>
+                                <div class="score-row">
+                                    <span class="score-label">🧱 Material Fit</span>
+                                    <div class="score-bar-track">
+                                        <div class="score-bar-fill" id="bar-material"
+                                            style="width:0%;background:#C8713D"></div>
+                                    </div>
+                                    <span class="score-val" id="bar-material-val">—</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Recommendations -->
+                        <div class="glass-card">
+                            <div
+                                style="font-size:0.78rem;font-weight:700;color:var(--tan);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:18px">
+                                💡 Recommendations
+                            </div>
+                            <div id="recommendations-list">
+                                <div style="color:var(--tan);font-size:0.82rem">Running analysis...</div>
+                            </div>
+
+                            <button class="btn-run-analysis" id="btn-go-optimize"
+                                style="margin-top:20px;display:none;align-items:center;justify-content:center;gap:8px">
+                                <span>🔄 Run Optimization</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- ════════════════════════════════════════════════
+                         DRDO / IDEX SOFTWARE CATEGORY — 3 REQUIRED OUTPUTS
+                    ════════════════════════════════════════════════ -->
+                    <div class="drdo-section" style="margin-top:32px">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:12px;padding-bottom:12px;border-bottom:1px solid var(--glass-border)">
+                            <div>
+                                <div style="font-size:0.75rem;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:1px">
+                                    DRDO / IDEX Software Category — Physics Evaluation Outputs
+                                </div>
+                                <h2 style="font-size:1.25rem;color:var(--sandal-light);margin-top:2px">
+                                    Deterministic Transient RC Network Simulation Results (48-Hour Cycle)
+                                </h2>
+                            </div>
+                            <button id="btn-generate-drdo-report" class="btn-run-analysis" style="font-size:0.82rem;padding:8px 18px;background:linear-gradient(135deg, #2E7D32, #1B5E20);border-color:#4CAF50">
+                                📄 Generate DRDO Evaluation Report (Gemini AI)
+                            </button>
+                        </div>
+
+                        <!-- 3 DRDO Task Charts Grid -->
+                        <div style="display:grid;grid-template-columns:1fr;gap:22px">
+                            <!-- TASK 1: Inside vs Ambient Temperature Chart -->
+                            <div class="glass-card">
+                                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px">
+                                    <div>
+                                        <span style="background:rgba(200,113,61,0.3);color:var(--gold);padding:3px 8px;border-radius:4px;font-size:0.7rem;font-weight:700">TASK 1</span>
+                                        <span style="font-size:0.9rem;font-weight:700;color:var(--sandal-light);margin-left:8px">
+                                            Predicted Inside Air Temperature vs Ambient Temperature
+                                        </span>
+                                    </div>
+                                    <div id="stat-temp-summary" style="font-size:0.75rem;color:var(--tan);font-family:var(--font-mono)">
+                                        Min Night: —°C | Max Day: —°C | Swing: —°C
+                                    </div>
+                                </div>
+                                <div style="height:280px;position:relative">
+                                    <canvas id="chart-drdo-temp"></canvas>
+                                </div>
+                                <div style="font-size:0.72rem;color:var(--tan);margin-top:8px;display:flex;justify-content:space-between">
+                                    <span>🟢 Green Shaded Band: 18°C–24°C Comfort Threshold</span>
+                                    <span>Dotted Blue: Ambient Outdoor Temperature (NASA POWER)</span>
+                                </div>
+                            </div>
+
+                            <!-- TASK 2: Solar Thermal Energy Gain Chart -->
+                            <div class="glass-card">
+                                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px">
+                                    <div>
+                                        <span style="background:rgba(232,168,56,0.3);color:var(--gold);padding:3px 8px;border-radius:4px;font-size:0.7rem;font-weight:700">TASK 2</span>
+                                        <span style="font-size:0.9rem;font-weight:700;color:var(--sandal-light);margin-left:8px">
+                                            Predicted Solar Thermal Energy Gain (Hourly Watts + Cumulative kWh)
+                                        </span>
+                                    </div>
+                                    <div id="stat-solar-total" style="font-size:0.8rem;font-weight:700;color:var(--gold);font-family:var(--font-mono)">
+                                        Cumulative Solar Absorbed: — kWh
+                                    </div>
+                                </div>
+                                <div style="height:260px;position:relative">
+                                    <canvas id="chart-drdo-solar"></canvas>
+                                </div>
+                            </div>
+
+                            <!-- TASK 3: Heat Flow Breakdown Chart -->
+                            <div class="glass-card">
+                                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px">
+                                    <div>
+                                        <span style="background:rgba(91,155,213,0.3);color:#89CFF0;padding:3px 8px;border-radius:4px;font-size:0.7rem;font-weight:700">TASK 3</span>
+                                        <span style="font-size:0.9rem;font-weight:700;color:var(--sandal-light);margin-left:8px">
+                                            Heat Flow Breakdown: Conduction, Infiltration, Radiative Sky Loss, Storage
+                                        </span>
+                                    </div>
+                                    <div style="font-size:0.75rem;color:var(--tan)">
+                                        Heat transfer driven by (T_ambient - T_inside) [Watts]
+                                    </div>
+                                </div>
+                                <div style="height:260px;position:relative">
+                                    <canvas id="chart-drdo-heatflow"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="nav-buttons">
+                        <button class="btn-back" data-back="5">← Back to Simulation</button>
+                        <button class="btn-next" data-next="7">Run Comparative Optimizer →</button>
+                    </div>
+                </section>
+
+                <!-- ────────────────────────────────────────
+           STEP 7 — OPTIMIZER
+      ──────────────────────────────────────── -->
+                <section id="step-7" class="step-panel">
+                    <div class="section-header">
+                        <div class="section-tag">Step 7 of 7</div>
+                        <h1 class="section-title">Design <span>Optimization</span></h1>
+                        <p class="section-sub">Our engine evaluates all material combinations to find the
+                            highest-performing design for your climate.</p>
+                    </div>
+
+                    <!-- Optimization Progress -->
+                    <div id="opt-progress-container" class="glass-card" style="margin-bottom:24px;text-align:center">
+                        <div style="font-size:1rem;font-weight:700;color:var(--sandal-light);margin-bottom:16px">
+                            🔄 Running Optimization Engine...
+                        </div>
+                        <div
+                            style="height:8px;background:rgba(212,169,106,0.1);border-radius:4px;overflow:hidden;margin-bottom:10px">
+                            <div id="opt-progress-bar"
+                                style="height:100%;width:0%;background:linear-gradient(90deg,var(--terracotta),var(--gold));border-radius:4px;transition:width 0.1s">
+                            </div>
+                        </div>
+                        <div id="opt-progress-label"
+                            style="font-size:0.78rem;color:var(--tan);font-family:var(--font-mono)">Initializing...
+                        </div>
+                    </div>
+
+                    <div class="opt-layout">
+                        <!-- Comparison Table -->
+                        <div class="glass-card">
+                            <div
+                                style="font-size:0.78rem;font-weight:700;color:var(--tan);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:18px">
+                                📊 Material Comparison
+                            </div>
+                            <div id="comparison-table-container">
+                                <div style="color:var(--tan);text-align:center;padding:30px">Running optimization...
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Score Comparison -->
+                        <div>
+                            <div class="glass-card" style="margin-bottom:20px">
+                                <div
+                                    style="font-size:0.78rem;font-weight:700;color:var(--tan);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:18px">
+                                    📈 Performance Comparison
+                                    <span style="font-size:0.65rem;color:var(--tan);margin-left:8px;font-weight:400">
+                                        🔴 Current vs 🟢 Optimized
+                                    </span>
+                                </div>
+                                <div id="score-comparison-container">
+                                    <div style="color:var(--tan);text-align:center;padding:20px">Computing...</div>
+                                </div>
+                            </div>
+
+                            <!-- Optimized 3D -->
+                            <div class="glass-card-dark">
+                                <div
+                                    style="font-size:0.78rem;font-weight:700;color:var(--tan);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:12px">
+                                    🏠 Updated 3D Model (Optimized Materials)
+                                </div>
+                                <p style="font-size:0.78rem;color:var(--tan);margin-bottom:12px">
+                                    The 3D viewer in Step 4 has been updated with the optimized material colors.
+                                    Navigate back to Step 4 to inspect.
+                                </p>
+                                <div style="display:flex;gap:10px;flex-wrap:wrap">
+                                    <button class="btn-back" data-back="4" style="flex:1;justify-content:center">
+                                        ← View Optimized 3D Model
+                                    </button>
+                                    <button class="btn-run-analysis"
+                                        onclick="goToStep(1);document.getElementById('landing').classList.add('hidden');document.getElementById('app-shell').classList.remove('hidden');"
+                                        style="flex:1;font-size:0.82rem">
+                                        <span>🔁 New Design</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="nav-buttons">
+                        <button class="btn-back" data-back="6">← Back to Results</button>
+                        <div
+                            style="display:flex;align-items:center;gap:8px;padding:10px 20px;background:var(--glass-brown);border:1px solid var(--glass-border);border-radius:var(--radius-full);font-size:0.82rem;color:var(--gold)">
+                            ✅ Analysis Complete
+                        </div>
+                    </div>
+                </section>
+
+            </main><!-- /main-content -->
+        </div><!-- /app -->
+    </div><!-- /app-shell -->
+
+    <!-- ── Toast Container ── -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- ════════════════════════════════════════════════
+         GEMINI AI ASSISTANT MODAL
+    ════════════════════════════════════════════════ -->
+    <div id="modal-gemini" class="modal-backdrop hidden" style="position:fixed;inset:0;background:rgba(10,5,2,0.85);backdrop-filter:blur(8px);z-index:9999;display:none;align-items:center;justify-content:center;padding:20px">
+        <div class="modal-card" style="background:var(--charcoal-deep);border:1px solid var(--glass-border);border-radius:16px;width:100%;max-width:650px;max-height:90vh;overflow-y:auto;padding:24px;box-shadow:0 20px 50px rgba(0,0,0,0.8)">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px">
+                <div style="display:flex;align-items:center;gap:10px">
+                    <span style="font-size:1.5rem">✨</span>
+                    <div>
+                        <div style="font-weight:700;color:var(--sandal-light);font-size:1.1rem">Gemini AI Assistant</div>
+                        <div style="font-size:0.72rem;color:var(--tan)">Natural Language Parser & Material Property Estimator</div>
+                    </div>
+                </div>
+                <button id="modal-gemini-close" style="background:none;border:none;color:var(--tan);font-size:1.4rem;cursor:pointer">✕</button>
+            </div>
+
+            <!-- Tabs -->
+            <div style="display:flex;gap:10px;border-bottom:1px solid var(--glass-border);margin-bottom:18px">
+                <button class="gemini-tab active" data-tab="parser" style="background:none;border:none;border-bottom:2px solid var(--gold);color:var(--sandal-light);padding:8px 12px;font-size:0.8rem;font-weight:600;cursor:pointer">
+                    📝 Free-Text Shelter Parser
+                </button>
+                <button class="gemini-tab" data-tab="materials" style="background:none;border:none;color:var(--tan);padding:8px 12px;font-size:0.8rem;font-weight:600;cursor:pointer">
+                    🧱 Material Lookup
+                </button>
+                <button class="gemini-tab" data-tab="apikey" style="background:none;border:none;color:var(--tan);padding:8px 12px;font-size:0.8rem;font-weight:600;cursor:pointer">
+                    🔑 API Key
+                </button>
+            </div>
+
+            <!-- Tab 1: Parser -->
+            <div id="tab-gemini-parser" class="gemini-tab-content">
+                <p style="font-size:0.78rem;color:var(--tan);margin-bottom:12px">
+                    Describe your shelter in natural language. Gemini will parse dimensions, shape, orientation, and materials to auto-configure your model:
+                </p>
+                <textarea id="gemini-prompt-input" rows="4" style="width:100%;background:rgba(0,0,0,0.4);border:1px solid var(--glass-border);border-radius:8px;padding:12px;color:var(--sandal-light);font-size:0.85rem;resize:vertical;margin-bottom:12px" placeholder="e.g. A 6m by 8m single-room passive shelter in Leh with 40cm rammed earth walls, 100mm insulated sandwich roof, and 2 south-facing double glazed windows..."></textarea>
+                <div style="display:flex;justify-content:space-between;align-items:center">
+                    <button id="btn-run-gemini-parse" class="btn-run-analysis" style="font-size:0.8rem;padding:8px 16px">
+                        <span>⚡ Parse & Configure Shelter</span>
+                    </button>
+                    <span id="gemini-parse-status" style="font-size:0.75rem;color:var(--tan)"></span>
+                </div>
+            </div>
+
+            <!-- Tab 2: Materials -->
+            <div id="tab-gemini-materials" class="gemini-tab-content" style="display:none">
+                <p style="font-size:0.78rem;color:var(--tan);margin-bottom:12px">
+                    Enter any regional or informal building material to retrieve its standard thermal conductivity (k), density, specific heat, and absorptance:
+                </p>
+                <div style="display:flex;gap:10px;margin-bottom:14px">
+                    <input type="text" id="gemini-mat-query" placeholder="e.g. Spiti mud brick, rice husk ash block, birch bark layer" style="flex:1;background:rgba(0,0,0,0.4);border:1px solid var(--glass-border);border-radius:8px;padding:10px;color:var(--sandal-light);font-size:0.85rem">
+                    <button id="btn-run-gemini-mat" class="btn-run-analysis" style="font-size:0.8rem;padding:8px 16px">
+                        Lookup
+                    </button>
+                </div>
+                <div id="gemini-mat-result" style="background:rgba(0,0,0,0.3);border:1px solid var(--glass-border);border-radius:8px;padding:14px;font-size:0.8rem;display:none">
+                </div>
+            </div>
+
+            <!-- Tab 3: API Key -->
+            <div id="tab-gemini-apikey" class="gemini-tab-content" style="display:none">
+                <p style="font-size:0.78rem;color:var(--tan);margin-bottom:12px">
+                    Provide a Google Gemini API Key for live AI queries. (Works out of the box with offline engineering models if key is blank):
+                </p>
+                <input type="password" id="input-gemini-key" placeholder="AIzaSy..." style="width:100%;background:rgba(0,0,0,0.4);border:1px solid var(--glass-border);border-radius:8px;padding:10px;color:var(--sandal-light);font-size:0.85rem;margin-bottom:12px">
+                <button id="btn-save-gemini-key" class="btn-run-analysis" style="font-size:0.8rem;padding:8px 16px">
+                    Save Key
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ════════════════════════════════════════════════
+         DRDO EVALUATION REPORT MODAL
+    ════════════════════════════════════════════════ -->
+    <div id="modal-report" class="modal-backdrop hidden" style="position:fixed;inset:0;background:rgba(10,5,2,0.85);backdrop-filter:blur(8px);z-index:9999;display:none;align-items:center;justify-content:center;padding:20px">
+        <div class="modal-card" style="background:var(--charcoal-deep);border:1px solid var(--glass-border);border-radius:16px;width:100%;max-width:800px;max-height:90vh;overflow-y:auto;padding:28px;box-shadow:0 20px 50px rgba(0,0,0,0.8)">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;border-bottom:1px solid var(--glass-border);padding-bottom:12px">
+                <div>
+                    <div style="font-weight:700;color:var(--sandal-light);font-size:1.15rem">DRDO / IDEX Technical Evaluation Report</div>
+                    <div style="font-size:0.72rem;color:var(--gold)">Generated via Gemini AI Layer from Deterministic Simulation Results</div>
+                </div>
+                <button id="modal-report-close" style="background:none;border:none;color:var(--tan);font-size:1.4rem;cursor:pointer">✕</button>
+            </div>
+
+            <div id="drdo-report-content" style="font-family:var(--font-mono);font-size:0.82rem;line-height:1.6;color:var(--sandal-light);white-space:pre-wrap;background:rgba(0,0,0,0.35);padding:18px;border-radius:8px;border:1px solid var(--glass-border);margin-bottom:18px">
+                Generating technical evaluation report...
+            </div>
+
+            <div style="display:flex;justify-content:flex-end;gap:12px">
+                <button id="btn-copy-report" style="background:var(--glass-brown);border:1px solid var(--glass-border);color:var(--sandal-light);padding:8px 16px;border-radius:6px;font-size:0.8rem;cursor:pointer">
+                    📋 Copy to Clipboard
+                </button>
+                <button id="btn-close-report" class="btn-run-analysis" style="font-size:0.8rem;padding:8px 18px">
+                    Done
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── JS Modules (order matters) ── -->
+    <script src="js/physicsEngine.js?v=20260912-3"></script>
+    <script src="js/nasaPower.js?v=20260912-3"></script>
+    <script src="js/geminiService.js?v=20260912-3"></script>
+    <script src="js/mlPredictor.js?v=20260912-3"></script>
+    <script src="js/materials.js?v=20260912-3"></script>
+    <script src="js/optimizer.js?v=20260912-3"></script>
+    <script src="js/dimensions.js?v=20260912-3"></script>
+    <script src="js/location.js?v=20260912-3"></script>
+    <script src="js/viewer3d.js?v=20260912-3"></script>
+    <script src="js/simulation.js?v=20260912-3"></script>
+    <script src="js/app.js?v=20260912-3"></script>
+
+</body>
+
+</html>
